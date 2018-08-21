@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(gazebo_rangebearing_plugin)
-find_package(catkin REQUIRED COMPONENTS gazebo_dev roscpp message_generation)
+find_package(catkin REQUIRED COMPONENTS
+  gazebo_dev
+  roscpp
+  message_generation
+  xacro
+)
 find_package(Eigen3 REQUIRED)
 
+catkin_package(
+  CATKIN_DEPENDS xacro
+  )
 
 # Plugins require c++11
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
@@ -15,6 +23,25 @@ include_directories( #include
 link_directories(
   ${catkin_LIBRARY_DIRS}
 )
+
+
+# Generate urdf files from xacro and install
+xacro_add_files(
+  urdf/rangebearing.urdf.xacro
+  INORDER INSTALL DESTINATION urdf
+)
+
+# Install xacro files / macros
+install(DIRECTORY urdf/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/urdf)
+
+# Install config files
+install(DIRECTORY config/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/config)
+
+# Install launch files
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch)
 
 ## Declare a C++ library
 add_library(gazebo_rangebearing_plugin

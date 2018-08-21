@@ -45,11 +45,13 @@ std::string RangeBearing::Topic() const
 //////////////////////////////////////////////////
 void RangeBearing::Load(const std::string &_worldName)
 {
+  gzwarn << "Load \n";
 }
 
 /////////////////////////////////////////////////
 void RangeBearing::Init()
 {
+  gzwarn << "Init \n";
   Sensor::Init();
 }
 
