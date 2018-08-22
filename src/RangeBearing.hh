@@ -1,14 +1,29 @@
 #ifndef _RANGEBEARING_HH_
 #define _RANGEBEARING_HH_
 
+#include <cmath>
 
 #include "gazebo/sensors/Sensor.hh"
 #include "gazebo/util/system.hh"
 
+#include <std_msgs/MultiArrayDimension.h>
+#include <std_msgs/Float32MultiArray.h>
+
 #include <gazebo/common/common.hh>
 #include <gazebo/math/Vector3.hh>
+#include <gazebo/math/Pose.hh>
+
 #include <gazebo/physics/physics.hh>
 #include <sdf/sdf.hh>
+
+#include "update_timer.h"
+
+#include <algorithm>    // std::min
+
+inline double clamp(double val, double top, double bottom)
+{
+  return std::max(bottom, std::min(val, top));
+}
 
 
 namespace gazebo
@@ -35,15 +50,30 @@ namespace gazebo
     // Documentation inherited
     protected: virtual void Update();
 
-    /// \brief Pointer to the model
-    private: physics::ModelPtr model;
+    private:
+      /// \brief The parent World
+      physics::WorldPtr world;
 
-    /// \brief Pointer to link
-    private: physics::LinkPtr link;
+      /// \brief Pointer to the model
+      physics::ModelPtr model;
 
-    /// \brief Pointer to the update event connection.
-    private: event::ConnectionPtr updateConnection;
+      /// \brief Pointer to link
+      physics::LinkPtr link;
 
+      /// \brief Pointer to the update event connection.
+      event::ConnectionPtr updateConnection;
+
+      /// \brief Update timer
+      UpdateTimer updateTimer;
+
+      ros::NodeHandle* nodeHandle;
+    
+      ros::Publisher rbPublisher;
+      std::string rbTopic;
+      std_msgs::Float32MultiArray rbMsg;
+      std::string rosNamespace;
+      std::string linkName;
+      math::Vector3 beaconPoint;
   };
 }
 
