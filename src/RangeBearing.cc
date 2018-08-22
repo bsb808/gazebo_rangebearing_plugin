@@ -1,3 +1,7 @@
+#include <ros/ros.h>
+#include <gazebo/math/Pose.hh>
+#include <tf2/LinearMath/Transform.h>
+
 #include "gazebo/physics/World.hh"
 #include "gazebo/physics/Model.hh"
 #include "gazebo/common/Assert.hh"
@@ -10,69 +14,36 @@
 #include "gazebo/sensors/SensorFactory.hh"
 #include "gazebo/sensors/Noise.hh"
 
-#include "RangeBearingPrivate.hh"
+
+//#include "RangeBearingPrivate.hh"
 #include "RangeBearing.hh"
 
 
 using namespace gazebo;
-using namespace sensors;
+//using namespace sensors;
 
-
-GZ_REGISTER_STATIC_SENSOR("rangebearing", RangeBearing)
 
 //////////////////////////////////////////////////
 RangeBearing::RangeBearing()
-: Sensor(sensors::OTHER),
-  dataPtr(new RangeBearingPrivate)
 {
+  ROS_WARN("Constructed");
+
 }
 
 
-RangeBearing::~RangeBearing()
-{
-}
 
 //////////////////////////////////////////////////
-std::string RangeBearing::Topic() const
-{
-  std::string topicName = "~/";
-  //topicName += this->ParentName() + "/" + this->Name() + "/scan";
-  //boost::replace_all(topicName, "::", "/");
-
-  return topicName;
-}
-
-//////////////////////////////////////////////////
-void RangeBearing::Load(const std::string &_worldName)
+void RangeBearing::Load(physics::ModelPtr _model,
+			sdf::ElementPtr _sdf)
 {
   gzwarn << "Load \n";
-}
+  ROS_WARN("Loading range bearing plugin");
 
-/////////////////////////////////////////////////
-void RangeBearing::Init()
-{
-  gzwarn << "Init \n";
-  Sensor::Init();
-}
-
-
-//////////////////////////////////////////////////
-void RangeBearing::Fini()
-{
-  Sensor::Fini();
-}
-
-
-//////////////////////////////////////////////////
-bool RangeBearing::UpdateImpl(const bool /*_force*/)
-{
-   return true;
 }
 
 //////////////////////////////////////////////////
-bool RangeBearing::IsActive() const
+void RangeBearing::Update()
 {
-  return Sensor::IsActive();
-  //||
-  //  (this->dataPtr->scanPub && this->dataPtr->scanPub->HasConnections());
+  return;
 }
+

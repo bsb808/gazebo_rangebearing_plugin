@@ -10,7 +10,7 @@
     <arg name="debug" value="false"/>
   </include>
 
-  <!-- Initial USV location and attitude-->
+  <!-- Initial bot location and attitude-->
   <arg name="x" default="0" />
   <arg name="y" default="0" />
   <arg name="z" default="0.1" />
@@ -19,12 +19,12 @@
   <arg name="Y" default="0" />
 
   <!-- Load robot model -->
-  <arg name="urdf" default="$(find gazebo_rangebearing_plugin)/urdf/rangebearing.urdf"/>
+  <arg name="urdf" default="$(find gazebo_rangebearing_plugin)/urdf/boxbot.urdf"/>
   <param name="robot_description" textfile="$(arg urdf)"/>
 
   <!-- Spawn model in Gazebo -->
   <node name="spawn_model" pkg="gazebo_ros" type="spawn_model"
   args="-x $(arg x) -y $(arg y) -z $(arg z)
         -R $(arg R) -P $(arg P) -Y $(arg Y)
-        -urdf -param robot_description -model spawned_box"/>
+        -urdf -param robot_description -model spawned_boxbot"/>
 </launch>

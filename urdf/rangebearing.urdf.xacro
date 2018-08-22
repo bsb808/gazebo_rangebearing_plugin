@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-
   <link name='box_link'>
     <inertial>
       <mass>1</mass>
@@ -23,20 +22,18 @@
     <visual name='visual'>
       <geometry>
         <box>
-          <size>0.1 0.1 0.1</size>
+          <size>1 1 1</size>
         </box>
       </geometry>
       <material>
         <script>
-          <name>Gazebo/Blue</name>
+          <name>Gazebo/Red</name>
           <uri>file://media/materials/scripts/gazebo.material</uri>
         </script>
       </material>
     </visual>
-    <self_collide>0</self_collide>
-    <kinematic>0</kinematic>
   </link>
-  
+
   <xacro:macro name="rangebearingmacro" params="name:=rangebearing x:=0 y:=0 z:=1.3 R:=0 P:=0 Y:=0">
     <link name="${name}_link">
       <visual name="${name}_visual_base">
