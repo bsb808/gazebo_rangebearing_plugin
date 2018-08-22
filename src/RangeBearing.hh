@@ -35,6 +35,15 @@ namespace gazebo
     // Documentation inherited
     protected: virtual void Update();
 
+    /// \brief Pointer to the model
+    private: physics::ModelPtr model;
+
+    /// \brief Pointer to link
+    private: physics::LinkPtr link;
+
+    /// \brief Pointer to the update event connection.
+    private: event::ConnectionPtr updateConnection;
+
   };
 }
 

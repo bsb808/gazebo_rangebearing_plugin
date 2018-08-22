@@ -38,12 +38,20 @@ void RangeBearing::Load(physics::ModelPtr _model,
 {
   gzwarn << "Load \n";
   ROS_WARN("Loading range bearing plugin");
-
+  
+  // Listen to the update event. This event is broadcast every
+  // simulation iteration.
+  this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+    std::bind(&RangeBearing::Update, this));
 }
 
 //////////////////////////////////////////////////
 void RangeBearing::Update()
 {
+  ROS_WARN("Update");
   return;
 }
+
+
+GZ_REGISTER_MODEL_PLUGIN(RangeBearing);
 

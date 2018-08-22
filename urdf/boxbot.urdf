@@ -4,9 +4,6 @@
   <gazebo reference="base_link">
     <material>Gazebo/Orange</material>
   </gazebo>
-  <gazebo>
-    <plugin name="rangebearing_plugin" filename="liabgazebo_rangebearing_plugin.so"/>
-  </gazebo>
   
   <!-- Base Link -->
   <link name="base_link">
@@ -30,5 +27,8 @@
     </inertial>
   </link>
 
+  <gazebo>
+    <plugin name="rangebearing_plugin" filename="libgazebo_rangebearing_plugin.so"/>
+  </gazebo>
  
 </robot>
