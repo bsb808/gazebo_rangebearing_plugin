@@ -26,8 +26,7 @@ using namespace gazebo;
 //////////////////////////////////////////////////
 RangeBearing::RangeBearing()
 {
-  ROS_WARN("Constructed");
-
+  ROS_DEBUG("Constructed");
 }
 
 
@@ -36,7 +35,7 @@ RangeBearing::RangeBearing()
 void RangeBearing::Load(physics::ModelPtr _model,
 			sdf::ElementPtr _sdf)
 {
-  ROS_INFO("Loading range bearing plugin");
+  ROS_INFO("Loading RangeBearing plugin");
 
   // Parse SDF
   if (!_sdf->HasElement("robotNamespace"))
@@ -74,6 +73,73 @@ void RangeBearing::Load(physics::ModelPtr _model,
       _sdf->GetElement("beaconPoint")->Get<math::Vector3>();
   }
 
+  // Noise setup and parse SDF
+  
+  if (_sdf->HasElement("rangeNoise"))
+  {
+    sdf::ElementPtr rangeNoiseElem = _sdf->GetElement("rangeNoise");
+    // Note - it is hardcoded into the NoiseFactory.cc that the SDF
+    // element be "noise".
+    if (rangeNoiseElem->HasElement("noise"))
+    {
+      this->rangeNoise =
+	sensors::NoiseFactory::NewNoiseModel(rangeNoiseElem->GetElement("noise"));
+    }
+    else{
+      this->rangeNoise = nullptr;
+      ROS_WARN("RangeBearing Plugin: The rangeNoise SDF element must contain noise tag");
+    }
+  }
+  else
+  {
+    this->rangeNoise = nullptr;
+    ROS_INFO("RangeBearing Plugin: No rangeNoise tag found, no noise added to measurements");
+  }
+  
+
+  if (_sdf->HasElement("bearingNoise"))
+  {
+    sdf::ElementPtr bearingNoiseElem = _sdf->GetElement("bearingNoise");
+    // Note - it is hardcoded into the NoiseFactory.cc that the SDF
+    // element be "noise".
+    if (bearingNoiseElem->HasElement("noise"))
+    {
+      this->bearingNoise =
+	sensors::NoiseFactory::NewNoiseModel(bearingNoiseElem->GetElement("noise"));
+    }
+    else{
+      this->bearingNoise = nullptr;
+      ROS_WARN("The bearingNoise SDF element must contain noise tag");
+    }
+  }
+  else
+  {
+    this->bearingNoise = nullptr;
+    ROS_INFO("RangeBearing Plugin: No bearingNoise tag found, no noise added to measurements");
+  }
+
+  if (_sdf->HasElement("elevationNoise"))
+  {
+    sdf::ElementPtr elevationNoiseElem = _sdf->GetElement("elevationNoise");
+    // Note - it is hardcoded into the NoiseFactory.cc that the SDF
+    // element be "noise".
+    if (elevationNoiseElem->HasElement("noise"))
+    {
+      this->elevationNoise =
+	sensors::NoiseFactory::NewNoiseModel(elevationNoiseElem->GetElement("noise"));
+    }
+    else{
+      this->elevationNoise = nullptr;
+      ROS_WARN("The elevationNoise SDF element must contain noise tag");
+    }
+  }
+  else
+  {
+    this->elevationNoise = nullptr;
+    ROS_INFO("RangeBearing Plugin: No elevationNoise tag found, no noise added to measurements");
+  }
+						   
+  
   // ROS Setup
   if (!ros::isInitialized())
   {
@@ -104,7 +170,7 @@ void RangeBearing::Load(physics::ModelPtr _model,
 //////////////////////////////////////////////////
 void RangeBearing::Update()
 {
-  ROS_WARN("Update");
+  ROS_DEBUG("Update");
 
   // Get Pose/Orientation from Gazebo (if no state subscriber is active)
   const math::Pose pose = this->link->GetWorldPose();
@@ -118,13 +184,24 @@ void RangeBearing::Update()
 							  beaconPoint.x-pose.pos.x);
   bearing -= euler.z;
   double pi = 3.15159;
-  bearing = clamp(bearing,pi,-pi);
+
   	
   double elevation = std::atan2(beaconPoint.z-pose.pos.z,
-								std::sqrt(std::pow(beaconPoint.x-pose.pos.x,2)+
-										  std::pow(beaconPoint.y-pose.pos.y,2)));
+				std::sqrt(std::pow(beaconPoint.x-pose.pos.x,2)+
+					  std::pow(beaconPoint.y-pose.pos.y,2)));
   elevation -= euler.y;
-  elevation = clamp(elevation,pi,-pi);
+
+  // Apply noise to each measurement
+  if (this->rangeNoise != nullptr)
+    range = this->rangeNoise->Apply(range);
+  if (this->bearingNoise != nullptr)
+    bearing = this->bearingNoise->Apply(bearing);
+  if (this->elevationNoise != nullptr)
+    elevation  = this->elevationNoise->Apply(elevation);
+  
+  // Constain to -pi to pi
+  elevation = constrainAngle(elevation);
+  bearing = constrainAngle(bearing);
   
   // Publish
   this->rbMsg.data.clear();
